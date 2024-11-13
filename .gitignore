@@ -33,4 +33,5 @@ include/
 # General
 .DS_Store
 
-graphql_responses.*
+# Application Specific
+src/genesis/graphql_responses.*
