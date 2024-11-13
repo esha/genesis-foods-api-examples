@@ -1,6 +1,7 @@
 import requests
 import configparser
 import json
+import csv
 import os
 
 # Read the configuration file
@@ -107,7 +108,33 @@ def export(graphql_query, food_type):
         file.write("\n]")  # Write the closing bracket for the JSON array
 
 
+def json_to_csv(json_file, csv_file):
+    """Convert a JSON file to CSV format."""
+
+    # Delete the file if it already exists
+    if os.path.exists(csv_file):
+        os.remove(csv_file)
+        print(f"Existing file '{csv_file}' has been deleted.")
+
+    # Extract the nested "foodSearchResults" list from the JSON structure
+    with open(json_file) as f:
+        json_file = json.load(f)
+
+    food_results = json_file[0]["data"]["foods"]["search"]["foodSearchResults"]
+
+    # Write JSON data to CSV
+    with open(csv_file, mode='w', newline='') as file:
+        # Use the keys of the first item as the header
+        fieldnames = food_results[0].keys()
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+        # Write header and rows
+        writer.writeheader()
+        writer.writerows(food_results)
+
+
 # Run the playground script
 if __name__ == "__main__":
     export(query, 'Ingredient')  # Ingredient or Recipe
+    json_to_csv(file_path, file_path.replace('.json', '.csv'))
     print(f"Complete. Exported results to {file_path}")

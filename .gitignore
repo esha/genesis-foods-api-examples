@@ -32,3 +32,5 @@ include/
 
 # General
 .DS_Store
+
+graphql_responses.*
