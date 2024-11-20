@@ -20,8 +20,6 @@ output_csv = config.get('files','output_csv')
 food_type = config.get('options', 'food_type')
 output_limit = int(config.get('options','limit',fallback=10000))
 
-print(output_limit)
-
 # Ensure the file is written to the local directory
 file_path = os.path.join(os.getcwd(), output_file)
 
