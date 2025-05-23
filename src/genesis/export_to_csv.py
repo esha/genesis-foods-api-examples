@@ -98,6 +98,39 @@ query($input : GetAnalysisInput!){
 }
 """
 
+statements_query = """
+query($input: GetFoodInput!){
+    foods{
+        get(input: $input){
+            food{
+                ... on Recipe{
+                    id
+                    name
+                    unitedStates2016AllergenStatement {
+                        englishStatements {
+                            statement
+                        }
+                    }
+                    unitedStates2016IngredientStatement {
+                        englishStatement {
+                            generatedStatement
+                        }
+                    }
+                }
+                ... on Ingredient{
+                    id
+                    name
+                    unitedStates2016AllergenStatement {
+                        englishStatements {
+                            statement
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+"""
 
 def run_query(graphql_query, variables):
     """Run a GraphQL query against the Genesis API with variables."""
@@ -143,7 +176,7 @@ def search(graphql_query, food_type):
     result_items = []
     variables = {
         "input": {
-            "searchText": '*',
+            "searchText": '',
             "foodTypes": [food_type],
             "itemSourceFilter": "Customer",
             "archiveFilter": "Unarchived",
@@ -160,6 +193,33 @@ def search(graphql_query, food_type):
         print(f"Found {total_count} results.")
 
     return result
+
+
+def get_statements(graphql_query, food_id):
+    statements = {}
+    variables = {
+        "input": {
+            "id": food_id
+        }
+    }
+
+    result = run_query(graphql_query, variables)
+    if result:
+        try:
+            statements['allergen_statement'] = result.get("data", {}).get("foods", {}).get("get", {}).get("food", {}).get("unitedStates2016AllergenStatement", {}).get("englishStatements", []).get("statement", "")
+        except:
+            statements['allergen_statement'] = ""
+        try:
+            statements['ingredient_statement'] = result.get("data", {}).get("foods", {}).get("get", {}).get("food", {}).get("unitedStates2016IngredientStatement", {}).get("englishStatement", []).get("generatedStatement", "")
+        except:
+            statements['ingredient_statement'] = ""
+    else:
+        statements['allergen_statement'] = ""
+        statements['ingredient_statement'] = ""
+        print(f"Unable to get statements for {food_id}")
+
+    return statements
+        
 
 
 def export_to_json(result):
@@ -217,12 +277,17 @@ if __name__ == "__main__":
     export_to_json(search_result)
 
     result_items = search_result.get("data", {}).get("foods", {}).get("search", {}).get("foodSearchResults", [])
-    hydrated_items = []
     for f in result_items:
         nutrients = get_analysis(analysis_query, f['id'])
+        # Add the nutrients to the food object
         for n in nutrients:
             f[n['nutrient']['name']] = n['value']
-        hydrated_items.append(f)
+        statements = get_statements(statements_query, f['id'])
+        # Add the statements to the food object
+        if statements['allergen_statement']:    
+            f['allergen_statement'] = statements['allergen_statement']
+        if statements['ingredient_statement']:
+            f['ingredient_statement'] = statements['ingredient_statement']
 
     json_to_csv(result_items, output_csv)
     print(f"Complete. Exported results to {output_csv}")
