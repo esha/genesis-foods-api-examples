@@ -3,6 +3,10 @@ import configparser
 import json
 import csv
 import os
+from logging_config import setup_logging
+
+# Set up logging
+logger = setup_logging()
 
 # Read the configuration file
 config = configparser.ConfigParser()
@@ -212,8 +216,8 @@ def run_query(graphql_query, variables):
     if response.status_code == 200:
         return response.json()
     else:
-        print(f"Request failed with status code {response.status_code}")
-        print(response.text)
+        logger.error(f"Request failed with status code {response.status_code}")
+        logger.error(response.text)
         return None
 
 
@@ -322,7 +326,7 @@ if __name__ == "__main__":
             if supplier != "":
                 if supplier.lower() not in suppliers:
                     supplier_id = create_supplier(supplier)
-                    print(f"Created new supplier for {supplier}")
+                    logger.info(f"Created new supplier for {supplier}")
                 else:
                     supplier_id = suppliers[supplier.lower()]
 
@@ -342,7 +346,7 @@ if __name__ == "__main__":
             unit = item.get("Unit", "Gram")
 
             if unit not in UNITS:
-                print(f"Unable to find unit '{unit}'!")
+                logger.error(f"Unable to find unit '{unit}'!")
                 errors = True
 
             weights = {
@@ -357,7 +361,7 @@ if __name__ == "__main__":
                     continue
                 if key not in nutrients:
                     errors = True
-                    print(f"Unknown column header '{key}' - Please correct")
+                    logger.error(f"Unknown column header '{key}' - Please correct")
                 else:
                     # Add to array
                     nutrient = {}
@@ -368,17 +372,17 @@ if __name__ == "__main__":
             if errors is False:
                 ingredient_id = create_ingredient(name)
                 # ingredient_id = "40159a64-6143-4aad-897f-905adc889bfd"
-                print(f"Created {name} with Ingredient ID f{ingredient_id}")
+                logger.info(f"Created {name} with Ingredient ID f{ingredient_id}")
 
                 update_food_item(ingredient_id, nutrientValues, weights)
-                print(f"Updated nutrients and weights on {name}")
+                logger.info(f"Updated nutrients and weights on {name}")
 
                 if supplier_id != "":
                     set_supplier_on_food(ingredient_id, supplier_id)
-                    print(f"Set supplier on {name} to {supplier}")
+                    logger.info(f"Set supplier on {name} to {supplier}")
 
                 if aliases != []:
                     update_aliases(ingredient_id, aliases)
-                    print(f"Updated aliases on {name}")
+                    logger.info(f"Updated aliases on {name}")
             else:
-                print(f"Skipped creation of '{name}'!")
+                logger.info(f"Skipped creation of '{name}'!")

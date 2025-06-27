@@ -3,6 +3,10 @@ import configparser
 import json
 import csv
 import os
+from logging_config import setup_logging
+
+# Set up logging
+logger = setup_logging()
 
 # Read the configuration file
 config = configparser.ConfigParser()
@@ -21,7 +25,7 @@ file_path = os.path.join(os.getcwd(), output_file)
 # Delete the file if it already exists
 if os.path.exists(file_path):
     os.remove(file_path)
-    print(f"Existing file '{file_path}' has been deleted.")
+    logger.info(f"Existing file '{file_path}' has been deleted.")
 
 # Define the headers
 headers = {
@@ -69,8 +73,8 @@ def run_query(graphql_query, variables):
     if response.status_code == 200:
         return response.json()
     else:
-        print(f"Request failed with status code {response.status_code}")
-        print(response.text)
+        logger.error(f"Request failed with status code {response.status_code}")
+        logger.error(response.text)
         return None
 
 
@@ -92,18 +96,18 @@ def export(graphql_query, food_type):
             }
         }
 
-        print(f"Running query...")
+        logger.info(f"Running query...")
         result = run_query(graphql_query, variables)
         if result:
             total_count = result.get("data", {}).get("foods", {}).get("search", {}).get("totalCount", 0)
-            print(f"Found {total_count} results")
+            logger.info(f"Found {total_count} results")
             if total_count > 0:
                 if not first_entry:
                     file.write(",\n")  # Add a comma before each entry - except the first
                 json.dump(result, file, indent=4)  # Append the JSON response to the file
                 first_entry = False
             else:
-                print(f"No results found. Skipping write.")
+                logger.info(f"No results found. Skipping write.")
 
         file.write("\n]")  # Write the closing bracket for the JSON array
 
@@ -114,7 +118,7 @@ def json_to_csv(json_file, csv_file):
     # Delete the file if it already exists
     if os.path.exists(csv_file):
         os.remove(csv_file)
-        print(f"Existing file '{csv_file}' has been deleted.")
+        logger.info(f"Existing file '{csv_file}' has been deleted.")
 
     # Extract the nested "foodSearchResults" list from the JSON structure
     with open(json_file) as f:
@@ -137,4 +141,4 @@ def json_to_csv(json_file, csv_file):
 if __name__ == "__main__":
     export(query, 'Ingredient')  # Ingredient or Recipe
     json_to_csv(file_path, file_path.replace('.json', '.csv'))
-    print(f"Complete. Exported results to {file_path}")
+    logger.info(f"Complete. Exported results to {file_path}")

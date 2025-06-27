@@ -3,6 +3,11 @@ import configparser
 import json
 import csv
 import os
+from datetime import datetime
+from logging_config import setup_logging
+
+# Set up logging
+logger = setup_logging()
 
 # Read the configuration file
 config = configparser.ConfigParser()
@@ -26,7 +31,7 @@ file_path = os.path.join(os.getcwd(), output_file)
 # Delete the file if it already exists
 if os.path.exists(file_path):
     os.remove(file_path)
-    print(f"Existing file '{file_path}' has been deleted.")
+    logger.info(f"Existing file '{file_path}' has been deleted.")
 
 # Define the headers
 headers = {
@@ -116,11 +121,26 @@ query($input: GetFoodInput!){
                             generatedStatement
                         }
                     }
+                    canada2016AllergenStatement {
+                        englishStatements {
+                            statement
+                        }
+                    }
+                    canada2016IngredientStatement { 
+                        englishStatement {
+                            generatedStatement
+                        }
+                    }
                 }
                 ... on Ingredient{
                     id
                     name
                     unitedStates2016AllergenStatement {
+                        englishStatements {
+                            statement
+                        }
+                    }
+                    canada2016AllergenStatement {
                         englishStatements {
                             statement
                         }
@@ -142,8 +162,10 @@ def run_query(graphql_query, variables):
     if response.status_code == 200:
         return response.json()
     else:
-        print(f"Request failed with status code {response.status_code}")
-        print(response.text)
+        logger.error(f"Request failed with status code {response.status_code}")
+        logger.error(response.text)
+        logger.error(f"Endpoint: {endpoint}")
+        logger.error(f"Query: {graphql_query} \r\n Variables: {variables}")
         return None
 
 
@@ -167,7 +189,7 @@ def get_analysis(graphql_query, food_id):
     if result:
         nutrients = result.get("data", {}).get("analysis", {}).get("getAnalysis", {}).get("analysis", {}).get("nutrientInfos", [])
         if len(nutrients) == 0:
-            print(f"Unable to get nutrient information for {food_id}")
+            logger.warning(f"Unable to get nutrient information for {food_id}")
 
     return nutrients
 
@@ -186,11 +208,11 @@ def search(graphql_query, food_type):
         }
     }
 
-    print(f"Running query...")
+    logger.info(f"Running query...")
     result = run_query(graphql_query, variables)
     if result:
         total_count = result.get("data", {}).get("foods", {}).get("search", {}).get("totalCount", 0)
-        print(f"Found {total_count} results.")
+        logger.info(f"Found {total_count} results.")
 
     return result
 
@@ -216,7 +238,7 @@ def get_statements(graphql_query, food_id):
     else:
         statements['allergen_statement'] = ""
         statements['ingredient_statement'] = ""
-        print(f"Unable to get statements for {food_id}")
+        logger.warning(f"Unable to get statements for {food_id}")
 
     return statements
         
@@ -247,7 +269,7 @@ def json_to_csv(food_results, csv_file):
     # Delete the file if it already exists
     if os.path.exists(csv_file):
         os.remove(csv_file)
-        print(f"Existing file '{csv_file}' has been deleted.")
+        logger.info(f"Existing file '{csv_file}' has been deleted.")
 
     # Different results may have different fields; handle
     fieldnames = []
@@ -269,9 +291,12 @@ def json_to_csv(food_results, csv_file):
 
 # Run the playground script
 if __name__ == "__main__":
+    start_time = datetime.now()
+    logger.info(f"Starting export process...")
+    
     search_result = search(query, food_type)  # Food type from config
     if search_result is None:
-        print(f"No results found. Exiting.")
+        logger.error(f"No results found. Exiting.")
         exit(0)
 
     export_to_json(search_result)
@@ -290,4 +315,8 @@ if __name__ == "__main__":
             f['ingredient_statement'] = statements['ingredient_statement']
 
     json_to_csv(result_items, output_csv)
-    print(f"Complete. Exported results to {output_csv}")
+    
+    end_time = datetime.now()
+    elapsed_time = end_time - start_time
+    logger.info(f"Complete. Exported results to {output_csv}")
+    logger.info(f"Total elapsed time: {elapsed_time}")

@@ -3,6 +3,10 @@ import configparser
 import json
 import os
 import uuid
+from logging_config import setup_logging
+
+# Set up logging
+logger = setup_logging()
 
 # Read the configuration file
 config = configparser.ConfigParser()
@@ -79,7 +83,7 @@ def run_mutation(food, food_type):
     if response.status_code == 200:
         return response.json()
     else:
-        print(f"Error: {response.status_code} - {response.text}")
+        logger.error(f"Error: {response.status_code} - {response.text}")
         return None
 
 
@@ -89,15 +93,15 @@ def bulk_import(food_type, file_path):
         data = json.load(f)
 
     for food in data:
-        print(f"Importing {food_type}: {food.get('name')}")
+        logger.info(f"Importing {food_type}: {food.get('name')}")
         result = run_mutation(food, food_type)
 
         if result and "errors" in result:
-            print(f"Error while creating {food_type}: {food.get('name')}")
-            print(result["errors"])
+            logger.error(f"Error while creating {food_type}: {food.get('name')}")
+            logger.error(result["errors"])
         elif result:
             created_food = result.get("data", {}).get("foods", {}).get("create", {}).get("food", {})
-            print(f"Created {food_type}: {created_food.get('name')} (ID: {created_food.get('id')})")
+            logger.info(f"Created {food_type}: {created_food.get('name')} (ID: {created_food.get('id')})")
 
 
 def main():
@@ -106,7 +110,7 @@ def main():
 
     # Ensure the file exists
     if not os.path.exists(input_file_path):
-        print(f"Input file '{input_file_path}' does not exist.")
+        logger.error(f"Input file '{input_file_path}' does not exist.")
         return
 
     # Import ingredients
