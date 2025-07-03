@@ -35,3 +35,4 @@ include/
 
 # Application Specific
 src/genesis/graphql_responses.*
+src/genesis/*.csv
