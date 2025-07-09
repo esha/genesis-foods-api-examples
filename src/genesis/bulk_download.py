@@ -87,7 +87,7 @@ def export(graphql_query, food_type):
 
         variables = {
             "input": {
-                "searchText": '*',
+                "searchText": '',
                 "foodTypes": [food_type],
                 "itemSourceFilter": "Customer",
                 "versionFilter": "All",

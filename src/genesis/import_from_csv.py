@@ -4,6 +4,7 @@ import json
 import csv
 import os
 from logging_config import setup_logging
+from units import *
 
 # Set up logging
 logger = setup_logging()
@@ -30,79 +31,6 @@ headers = {
 }
 
 ENGLISH = "973847da-8760-4b54-9981-a596640a4659"
-
-UNITS = {
-    "Gram": "a7df0af5-0008-0000-7484-751e8eaf05c6",
-    "Pound": "a7df0af5-0007-0000-7484-751e8eaf05c6",
-    "Kilogram": "a7df0af5-0009-0000-7484-751e8eaf05c6",
-    "Ounce-weight": "a7df0af5-0006-0000-7484-751e8eaf05c6"
-}
-
-nutrients = {
-    "Calories": "84a8709a-0000-0000-ebf9-90cea7d9d44f",
-    "Protein": "84a8709a-0001-0000-ebf9-90cea7d9d44f",
-    "Carbohydrates": "84a8709a-0002-0000-ebf9-90cea7d9d44f",
-    "Total Dietary Fiber": "84a8709a-0003-0000-ebf9-90cea7d9d44f",
-    "Total Soluble Fiber": "84a8709a-0004-0000-ebf9-90cea7d9d44f",
-    "Total Sugars": "84a8709a-0006-0000-ebf9-90cea7d9d44f",
-    "Monosaccharides": "84a8709a-0007-0000-ebf9-90cea7d9d44f",
-    "Disaccharides": "84a8709a-000b-0000-ebf9-90cea7d9d44f",
-    "Other Carbohydrate": "84a8709a-0010-0000-ebf9-90cea7d9d44f",
-    "Fat": "84a8709a-0011-0000-ebf9-90cea7d9d44f",
-    "Saturated Fat": "84a8709a-0012-0000-ebf9-90cea7d9d44f",
-    "Monounsaturated Fat": "84a8709a-0013-0000-ebf9-90cea7d9d44f",
-    "Polyunsaturated Fat": "84a8709a-0014-0000-ebf9-90cea7d9d44f",
-    "Trans Fat": "84a8709a-0015-0000-ebf9-90cea7d9d44f",
-    "Cholesterol": "84a8709a-0016-0000-ebf9-90cea7d9d44f",
-    "Water": "84a8709a-0017-0000-ebf9-90cea7d9d44f",
-    "Vitamin A - IU": "84a8709a-0019-0000-ebf9-90cea7d9d44f",
-    "Carotenoid RE": "84a8709a-001b-0000-ebf9-90cea7d9d44f",
-    "Retinol RE": "84a8709a-001c-0000-ebf9-90cea7d9d44f",
-    "Beta-Carotene": "84a8709a-001d-0000-ebf9-90cea7d9d44f",
-    "Vitamin B1 - Thiamin": "84a8709a-001e-0000-ebf9-90cea7d9d44f",
-    "Vitamin B2 - Riboflavin": "84a8709a-001f-0000-ebf9-90cea7d9d44f",
-    "Vitamin B3 - Niacin": "84a8709a-0020-0000-ebf9-90cea7d9d44f",
-    "Vitamin B6": "84a8709a-0022-0000-ebf9-90cea7d9d44f",
-    "Vitamin B12": "84a8709a-0023-0000-ebf9-90cea7d9d44f",
-    "Biotin": "84a8709a-0024-0000-ebf9-90cea7d9d44f",
-    "Vitamin C": "84a8709a-0025-0000-ebf9-90cea7d9d44f",
-    "Vitamin D - IU": "84a8709a-0026-0000-ebf9-90cea7d9d44f",
-    "Vitamin D": "84a8709a-0027-0000-ebf9-90cea7d9d44f",
-    "Folate": "84a8709a-002b-0000-ebf9-90cea7d9d44f",
-    "Vitamin K": "84a8709a-002c-0000-ebf9-90cea7d9d44f",
-    "Pantothenic Acid": "84a8709a-002d-0000-ebf9-90cea7d9d44f",
-    "Calcium": "84a8709a-002f-0000-ebf9-90cea7d9d44f",
-    "Chromium": "84a8709a-0031-0000-ebf9-90cea7d9d44f",
-    "Copper": "84a8709a-0032-0000-ebf9-90cea7d9d44f",
-    "Fluoride": "84a8709a-0033-0000-ebf9-90cea7d9d44f",
-    "Iodine": "84a8709a-0034-0000-ebf9-90cea7d9d44f",
-    "Iron": "84a8709a-0035-0000-ebf9-90cea7d9d44f",
-    "Magnesium": "84a8709a-0036-0000-ebf9-90cea7d9d44f",
-    "Manganese": "84a8709a-0037-0000-ebf9-90cea7d9d44f",
-    "Molybdenum": "84a8709a-0038-0000-ebf9-90cea7d9d44f",
-    "Phosphorus": "84a8709a-0039-0000-ebf9-90cea7d9d44f",
-    "Potassium": "84a8709a-003a-0000-ebf9-90cea7d9d44f",
-    "Selenium": "84a8709a-003b-0000-ebf9-90cea7d9d44f",
-    "Sodium": "84a8709a-003c-0000-ebf9-90cea7d9d44f",
-    "Zinc": "84a8709a-003d-0000-ebf9-90cea7d9d44f",
-    "Omega 3": "84a8709a-005b-0000-ebf9-90cea7d9d44f",
-    "Omega 6": "84a8709a-005c-0000-ebf9-90cea7d9d44f",
-    "Alcohol": "84a8709a-006f-0000-ebf9-90cea7d9d44f",
-    "Caffeine": "84a8709a-0070-0000-ebf9-90cea7d9d44f",
-    "Choline": "84a8709a-007f-0000-ebf9-90cea7d9d44f",
-    "Kilojoules": "84a8709a-0081-0000-ebf9-90cea7d9d44f",
-    "Vitamin E - Alpha Toco": "84a8709a-0087-0000-ebf9-90cea7d9d44f",
-    "Added Sugar": "84a8709a-0094-0000-ebf9-90cea7d9d44f",
-    "Folate DFE": "84a8709a-00b7-0000-ebf9-90cea7d9d44f",
-    "Vitamin A - RAE": "84a8709a-00c6-0000-ebf9-90cea7d9d44f",
-    "Salt": "84a8709a-00cf-0000-ebf9-90cea7d9d44f",
-    "Dietary Fiber (US 2016)": "84a8709a-00d0-0000-ebf9-90cea7d9d44f",
-    "Soluble Dietary Fiber (US 2016)": "84a8709a-00d1-0000-ebf9-90cea7d9d44f",
-    "Calories from Fat": "84a8709a-03ec-0000-ebf9-90cea7d9d44f",
-    "Calories from SatFat": "84a8709a-03ed-0000-ebf9-90cea7d9d44f",
-    "Calories from TransFat": "84a8709a-03f7-0000-ebf9-90cea7d9d44f",
-    "Vitamin A - RE": "30f21f68-ddba-4a1f-8020-b02d7839ede5"
-}
 
 supplier_query = """
 query ($input: GetUserAddedSuppliersInput!) {
@@ -205,6 +133,25 @@ mutation($input: SetSupplierInput!){
 }
 """
 
+set_allergen_mutation = """
+mutation($input: SetAllergensInput!){
+    foods{
+        setAllergens(input: $input){
+            food{
+                id
+                allergens{
+                    allergen{
+                        id
+                        name
+                    }
+                    occurrence
+                }
+            }
+        }
+    }
+}
+"""
+
 
 def run_query(graphql_query, variables):
     """Run a GraphQL query against the Genesis API with variables."""
@@ -242,6 +189,18 @@ def update_aliases(item_id, aliases):
         }
     }
     result = run_query(update_alias_mutation, variables)
+
+
+def set_allergens(item_id, allergenlist):
+    variables = {
+        "input": {
+            "foodId": item_id,
+            "foodAllergenInputs": allergenlist
+        }
+    }
+    result = run_query(set_allergen_mutation, variables)
+
+    return result
 
 
 def create_ingredient(name):
@@ -302,7 +261,7 @@ def set_supplier_on_food(food_id, supplier_id):
 
 if __name__ == "__main__":
 
-    # Get the list of suppliers
+    # Base work - Get the list of suppliers
 
     suppliers = get_suppliers()
 
@@ -357,17 +316,69 @@ if __name__ == "__main__":
             # Build out the nutrients
 
             for key in item.keys():
-                if key in ["Name", "Product", "Supplier", "Weight", "Unit", "Alias"]:
+                if key in ["Name", "Product", "Supplier", "Weight", "Unit", "Alias", "Authority", "Contains Allergens", "May Contain Allergens"]:
                     continue
-                if key not in nutrients:
+                if key not in NUTRIENTS:
                     errors = True
                     logger.error(f"Unknown column header '{key}' - Please correct")
                 else:
                     # Add to array
                     nutrient = {}
-                    nutrient["nutrientId"] = nutrients[key]
+                    nutrient["nutrientId"] = NUTRIENTS[key]
                     nutrient["value"] = item[key]
                     nutrientValues.append(nutrient)
+
+            # Set allergens, if appropriate
+
+            authority = item.get("Authority", "us")
+            contains = item.get("Contains Allergens", "")
+            maycontain = item.get("May Contain Allergens", "")
+            allergeninputs = []
+
+            # If any field is set, process allergens
+
+            if contains != "" or maycontain != "":
+
+                allergens = {}
+                if authority.lower() in ["us", "united states"]:
+                    allergens = ALLERGENS_US
+                elif authority.lower() in ["ca", "canada"]:
+                    allergens = ALLERGENS_CA
+                elif authority.lower() in ["aus", "australia", "nz"]:
+                    allergens = ALLERGENS_AUS
+                elif authority.lower() in ["mexico", "mx"]:
+                    allergens = ALLERGENS_MX
+                elif authority.lower() in ["eu", "european union"]:
+                    allergens = ALLERGENS_EU
+                else:
+                    errors = True
+                    logger.error(f"Unable to find valid authority for {authority}!")
+
+                # We have the authority, now let's gather allergens
+
+                if contains != "":
+                    for i in [value.lower().strip() for value in contains.split(",")]:
+                        if i not in allergens:
+                            logger.error(f"Could not find '{i}' in allergens for the {authority} authority!")
+                            errors = True
+                        else:
+                            allergen = {
+                                "allergenId": allergens[i],
+                                "occurrence": "Present"
+                            }
+                            allergeninputs.append(allergen)
+
+                if maycontain != "":
+                    for i in [value.lower().strip() for value in maycontain.split(",")]:
+                        if i not in allergens:
+                            logger.error(f"Could not find '{i}' in allergens for the {authority} authority!")
+                            errors = True
+                        else:
+                            allergen = {
+                                "allergenId": allergens[i],
+                                "occurrence": "MaybePresent"
+                            }
+                            allergeninputs.append(allergen)
 
             if errors is False:
                 ingredient_id = create_ingredient(name)
@@ -375,14 +386,18 @@ if __name__ == "__main__":
                 logger.info(f"Created {name} with Ingredient ID f{ingredient_id}")
 
                 update_food_item(ingredient_id, nutrientValues, weights)
-                logger.info(f"Updated nutrients and weights on {name}")
+                logger.info(f" Updated nutrients and weights on {name}")
 
                 if supplier_id != "":
                     set_supplier_on_food(ingredient_id, supplier_id)
-                    logger.info(f"Set supplier on {name} to {supplier}")
+                    logger.info(f" Set supplier on {name} to {supplier}")
 
                 if aliases != []:
                     update_aliases(ingredient_id, aliases)
-                    logger.info(f"Updated aliases on {name}")
+                    logger.info(f" Updated aliases on {name}")
+
+                if allergeninputs != []:
+                    set_allergens(ingredient_id, allergeninputs)
+                    logger.info(f" Updated allergens on {name}")
             else:
                 logger.info(f"Skipped creation of '{name}'!")
