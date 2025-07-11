@@ -152,6 +152,30 @@ mutation($input: SetAllergensInput!){
 }
 """
 
+verify_allergens_mutation = """
+mutation($input: SetAllergensVerifiedInput!){
+    foods{
+        setAllergensVerified(input: $input){
+            food{
+                allergensVerified
+            }
+        }
+    }
+}
+"""
+
+approve_food_mutation = """
+mutation($input: ApproveDocumentInput!){
+    documents{
+        approve(input: $input){
+            document{
+                id
+            }
+        }
+    }
+}
+"""
+
 
 def run_query(graphql_query, variables):
     """Run a GraphQL query against the Genesis API with variables."""
@@ -199,6 +223,29 @@ def set_allergens(item_id, allergenlist):
         }
     }
     result = run_query(set_allergen_mutation, variables)
+
+    return result
+
+
+def verify_allergens(item_id):
+    variables = {
+        "input": {
+            "foodId": item_id,
+            "allergensVerified": True
+        }
+    }
+    result = run_query(verify_allergens_mutation, variables)
+
+    return result
+
+
+def approve_food(item_id):
+    variables = {
+        "input": {
+            "documentId": item_id
+        }
+    }
+    result = run_query(approve_food_mutation, variables)
 
     return result
 
@@ -316,7 +363,7 @@ if __name__ == "__main__":
             # Build out the nutrients
 
             for key in item.keys():
-                if key in ["Name", "Product", "Supplier", "Weight", "Unit", "Alias", "Authority", "Contains Allergens", "May Contain Allergens"]:
+                if key in ["Name", "Product", "Status", "Supplier", "Weight", "Unit", "Alias", "Authority", "Contains Allergens", "May Contain Allergens"]:
                     continue
                 if key not in NUTRIENTS:
                     errors = True
@@ -399,5 +446,18 @@ if __name__ == "__main__":
                 if allergeninputs != []:
                     set_allergens(ingredient_id, allergeninputs)
                     logger.info(f" Updated allergens on {name}")
+
+                # Check if we're auto-approving
+
+                if item.get("Status", "draft").lower() == "approved":
+
+                    # We need to verify the allergens and approve the item
+
+                    verify_allergens(ingredient_id)
+                    logger.info(f" Verified allergens on {name}")
+
+                    approve_food(ingredient_id)
+                    logger.info(f" Approved ingredient {name}")
+
             else:
                 logger.info(f"Skipped creation of '{name}'!")
