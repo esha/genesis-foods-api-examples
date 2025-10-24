@@ -4,7 +4,8 @@ UNITS = {
     "Gram": "a7df0af5-0008-0000-7484-751e8eaf05c6",
     "Pound": "a7df0af5-0007-0000-7484-751e8eaf05c6",
     "Kilogram": "a7df0af5-0009-0000-7484-751e8eaf05c6",
-    "Ounce-weight": "a7df0af5-0006-0000-7484-751e8eaf05c6"
+    "Ounce-weight": "a7df0af5-0006-0000-7484-751e8eaf05c6",
+    "Serving": "a7df0af5-001f-0000-7484-751e8eaf05c6"
 }
 
 ALLERGENS_MX = {
