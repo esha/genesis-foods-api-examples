@@ -73,7 +73,8 @@ nutrients_to_include = ["Added Sugar",
                         "Trans Fat",
                         "Vitamin C",
                         "Vitamin D",
-                        "Calories from Fat"]
+                        "Calories from Fat",
+                        "Water"]
 
 # Define the GraphQL query
 query = """
@@ -141,6 +142,8 @@ query($input: GetFoodInput!){
                 }     
                 created
                 modified  
+                legacyKey
+                userCode
                 ... on Recipe{
                     id
                     name
@@ -301,6 +304,10 @@ def get_analysis_at_1serving(graphql_query, food_id):
     }
 
     result = run_query(graphql_query, variables)
+    if result.get("errors"):
+        logger.error(f"Error: No Food found for {food_id}")
+        return {}
+
     if result:
         nutrients = result.get("data", {}).get("analysis", {}).get("getAnalysis", {}).get("analysis", {}).get("nutrientInfos", [])
         if len(nutrients) == 0:
@@ -388,6 +395,11 @@ def get_recipe_items(recipe_id):
     
     logger.info(f"Running query to get recipe items for {recipe_id} ...")
     result = run_query(food_query, variables)
+
+    if result.get("errors"):
+        logger.error(f"Error: No Recipe found for {recipe_id}")
+        return []
+
     if result:
         return result.get("data", {}).get("foods", {}).get("get", {}).get("food", {}).get("items", [])
     else:
@@ -402,6 +414,10 @@ def get_food_details(food_id):
     
     logger.info(f"Running query to get item details for {food_id} ...")
     result = run_query(food_query, variables)
+    if result.get("errors"):
+        logger.error(f"Error: No Food found for {food_id}")
+        return {}
+
     if result:
         return result.get("data", {}).get("foods", {}).get("get", {}).get("food", {})
     else:
@@ -417,6 +433,11 @@ def get_label_id(graphql_query, food_id):
 
     logger.info(f"Running query to get label id for {food_id} ...")
     result = run_query(graphql_query, variables)
+
+    if result.get("errors"):
+        logger.error(f"Error: No Food found for {food_id}")
+        return ""
+    
     if result:
         # This assumes you only have one label for each food. If you have multiple labels, you will 
         # need to modify this. This also is regulation agnostic, it will return the first label id it finds regardless of regulation.
@@ -506,11 +527,11 @@ def process_recipe_items(search_result):
             for item in recipe_data:
                 food = item.get("food", {})
                 amount = item.get("amount", {})
-                customFields = food.get('customFields', [])
                 item_details = {
                     "recipe_id": recipe_id,
                     "item_id": food.get("id"),
-                    "item_usercode": next((cf['value'] for cf in customFields if cf.get('customField', {}).get('name') == 'User Code'), ""),
+                    "item_usercode": food.get('userCode', ''),
+                    "item_legacyKey": food.get('legacyKey', ''),
                     "item_name": food.get("name"),
                     "item_amount_measure": amount.get("unit", {}).get("name"),
                     "item_amount_quantity": amount.get("quantity", {}).get("value")
@@ -522,7 +543,7 @@ def process_recipe_items(search_result):
             
     # Export to CSV
     if all_recipe_items:        
-        fieldnames = ["recipe_id", "item_usercode", "item_id", "item_name", "item_amount_measure", "item_amount_quantity"]
+        fieldnames = ["recipe_id", "item_usercode", "item_legacyKey", "item_id", "item_name", "item_amount_measure", "item_amount_quantity"]
         
         with open(recipe_items_csv, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=fieldnames)
@@ -546,7 +567,9 @@ def process_ingredients(ingredient_result):
             conversions = ingredient_info.get('conversions', {})
             customFields = ingredient_info.get('customFields', [])
             subIngredients = ingredient_info.get('subIngredients', [])
-            item['usercode'] = next((cf['value'] for cf in customFields if cf.get('customField', {}).get('name') == 'User Code'), "")
+
+            item['usercode'] = ingredient_info.get('userCode', '')
+            item['legacyKey'] = ingredient_info.get('legacyKey', '')
 
             # Extract cost and amount information from amountCost
             if amountCost:
@@ -589,7 +612,7 @@ def process_recipes(recipe_result):
             amountCost = recipe_info.get('amountCost', {})
             conversions = recipe_info.get('conversions', {})
             customFields = recipe_info.get('customFields', [])
-
+            
             # Cook Method
             item['cookMethod'] = recipe_info.get('cookMethod', '')
             # Cook Time
@@ -615,7 +638,9 @@ def process_recipes(recipe_result):
             item['notes'] = '|'.join(note.get('text', '') for note in notes)
 
             # User Code
-            item['usercode'] = next((cf['value'] for cf in customFields if cf.get('customField', {}).get('name') == 'User Code'), "")                
+            item['usercode'] = recipe_info.get('userCode', '')               
+            item['legacyKey'] = recipe_info.get('legacyKey', '')
+
             filter_and_assign_nutrients(item, nutrients, nutrients_to_include)
 
             # Extract cost and amount information from amountCost
