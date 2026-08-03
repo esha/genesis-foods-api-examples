@@ -102,6 +102,8 @@ query($input: GetFoodInput!){
     foods{
         get(input: $input){
             food{
+                id
+                name
                 amountCost { 
                     amount {
                         quantity {
@@ -145,8 +147,6 @@ query($input: GetFoodInput!){
                 legacyKey
                 userCode
                 ... on Recipe{
-                    id
-                    name
                     cookMethod
                     cookTime
                     cookTemperature
@@ -181,8 +181,6 @@ query($input: GetFoodInput!){
                     }                    
                 }
                 ... on Ingredient{
-                    id
-                    name
                     subIngredients {
                         name
                         percentage
@@ -262,9 +260,47 @@ def run_query(graphql_query, variables):
         return None
 
 
-def get_analysis_at_100g(graphql_query, food_id):
-    nutrients = {}
+def nested_get(obj, *keys, default=None):
+    """Walk nested dict keys; treat missing keys and None values as default."""
+    for key in keys:
+        if not isinstance(obj, dict):
+            return default
+        obj = obj.get(key)
+    return default if obj is None else obj
 
+
+def format_graphql_errors(result):
+    """Summarize GraphQL errors with codes when present."""
+    if not result:
+        return "no response"
+    errors = result.get("errors") or []
+    if not errors:
+        return "unknown error"
+    parts = []
+    for err in errors:
+        code = (err.get("extensions") or {}).get("code")
+        message = err.get("message", "")
+        parts.append(f"{code}: {message}" if code else message)
+    return "; ".join(parts)
+
+
+def _get_analysis_nutrients(result, food_id):
+    """Extract nutrientInfos from a getAnalysis response, or empty list on failure."""
+    if not result or result.get("errors"):
+        logger.error(f"Error: analysis failed for {food_id} ({format_graphql_errors(result)})")
+        return []
+
+    nutrients = nested_get(
+        result, "data", "analysis", "getAnalysis", "analysis", "nutrientInfos", default=[]
+    )
+    if not isinstance(nutrients, list):
+        nutrients = []
+    if len(nutrients) == 0:
+        logger.warning(f"Unable to get nutrient information for {food_id}")
+    return nutrients
+
+
+def get_analysis_at_100g(graphql_query, food_id):
     variables = {
         "input": {
             "foodId": food_id,
@@ -279,17 +315,10 @@ def get_analysis_at_100g(graphql_query, food_id):
     }
 
     result = run_query(graphql_query, variables)
-    if result:
-        nutrients = result.get("data", {}).get("analysis", {}).get("getAnalysis", {}).get("analysis", {}).get("nutrientInfos", [])
-        if len(nutrients) == 0:
-            logger.warning(f"Unable to get nutrient information for {food_id}")
-
-    return nutrients
+    return _get_analysis_nutrients(result, food_id)
 
 # Get Net analysis at 1 serving. 
 def get_analysis_at_1serving(graphql_query, food_id):
-    nutrients = {}
-
     variables = {
         "input": {
             "foodId": food_id,
@@ -304,21 +333,10 @@ def get_analysis_at_1serving(graphql_query, food_id):
     }
 
     result = run_query(graphql_query, variables)
-    if result.get("errors"):
-        logger.error(f"Error: No Food found for {food_id}")
-        return {}
-
-    if result:
-        nutrients = result.get("data", {}).get("analysis", {}).get("getAnalysis", {}).get("analysis", {}).get("nutrientInfos", [])
-        if len(nutrients) == 0:
-            logger.warning(f"Unable to get nutrient information for {food_id}")
-
-    return nutrients
+    return _get_analysis_nutrients(result, food_id)
 
 # Get LabelRounded analysis at 1 serving. 
 def get_analysis_labelrounded(graphql_query, food_id, label_id):
-    nutrients = {}
-
     variables = {
         "input": {
             "foodId": food_id,
@@ -334,12 +352,7 @@ def get_analysis_labelrounded(graphql_query, food_id, label_id):
     }
 
     result = run_query(graphql_query, variables)
-    if result:
-        nutrients = result.get("data", {}).get("analysis", {}).get("getAnalysis", {}).get("analysis", {}).get("nutrientInfos", [])
-        if len(nutrients) == 0:
-            logger.warning(f"Unable to get nutrient information for {food_id}")
-
-    return nutrients
+    return _get_analysis_nutrients(result, food_id)
 
 
 def search(graphql_query, food_type):
@@ -358,7 +371,7 @@ def search(graphql_query, food_type):
     logger.info(f"Running query...")
     result = run_query(graphql_query, variables)
     if result:
-        total_count = result.get("data", {}).get("foods", {}).get("search", {}).get("totalCount", 0)
+        total_count = nested_get(result, "data", "foods", "search", "totalCount", default=0)
         logger.info(f"Found {total_count} results.")
 
     return result
@@ -381,7 +394,7 @@ def search_by_modified_date(graphql_query, food_type, modified_after, modified_b
     logger.info(f"Running query...")
     result = run_query(graphql_query, variables)
     if result:
-        total_count = result.get("data", {}).get("foods", {}).get("search", {}).get("totalCount", 0)
+        total_count = nested_get(result, "data", "foods", "search", "totalCount", default=0)
         logger.info(f"Found {total_count} results.")
 
     return result
@@ -396,14 +409,12 @@ def get_recipe_items(recipe_id):
     logger.info(f"Running query to get recipe items for {recipe_id} ...")
     result = run_query(food_query, variables)
 
-    if result.get("errors"):
-        logger.error(f"Error: No Recipe found for {recipe_id}")
+    if not result or result.get("errors"):
+        logger.error(f"Error getting recipe items for {recipe_id} ({format_graphql_errors(result)})")
         return []
 
-    if result:
-        return result.get("data", {}).get("foods", {}).get("get", {}).get("food", {}).get("items", [])
-    else:
-        return []
+    items = nested_get(result, "data", "foods", "get", "food", "items", default=[])
+    return items if isinstance(items, list) else []
     
 def get_food_details(food_id):
     variables = {
@@ -414,15 +425,15 @@ def get_food_details(food_id):
     
     logger.info(f"Running query to get item details for {food_id} ...")
     result = run_query(food_query, variables)
-    if result.get("errors"):
-        logger.error(f"Error: No Food found for {food_id}")
+    if not result or result.get("errors"):
+        logger.error(f"Error getting food details for {food_id} ({format_graphql_errors(result)})")
         return {}
 
-    if result:
-        return result.get("data", {}).get("foods", {}).get("get", {}).get("food", {})
-    else:
+    food = nested_get(result, "data", "foods", "get", "food", default={})
+    if not isinstance(food, dict) or not food:
         logger.error(f"Failed to get details for {food_id}")
         return {}
+    return food
 
 def get_label_id(graphql_query, food_id):
     variables = {
@@ -434,20 +445,17 @@ def get_label_id(graphql_query, food_id):
     logger.info(f"Running query to get label id for {food_id} ...")
     result = run_query(graphql_query, variables)
 
-    if result.get("errors"):
-        logger.error(f"Error: No Food found for {food_id}")
+    if not result or result.get("errors"):
+        logger.error(f"Error getting labels for {food_id} ({format_graphql_errors(result)})")
         return ""
-    
-    if result:
-        # This assumes you only have one label for each food. If you have multiple labels, you will 
-        # need to modify this. This also is regulation agnostic, it will return the first label id it finds regardless of regulation.
-        labels = result.get("data", {}).get("labels", {}).get("getLabelsForFood", {}).get("labels", [])
-        logger.info(f"Found {len(labels)} labels for {food_id}")
-        return labels[0].get("id", "") if labels else ""
-    else:
-        logger.warning(f"No labels found for {food_id}")
-        logger.error(f"Failed to get label id for {food_id}")
-        return ""
+
+    # This assumes you only have one label for each food. If you have multiple labels, you will
+    # need to modify this. This also is regulation agnostic, it will return the first label id it finds regardless of regulation.
+    labels = nested_get(result, "data", "labels", "getLabelsForFood", "labels", default=[])
+    if not isinstance(labels, list):
+        labels = []
+    logger.info(f"Found {len(labels)} labels for {food_id}")
+    return labels[0].get("id", "") if labels else ""
 
 def export_to_json(result):
     first_entry = True
@@ -509,7 +517,9 @@ def process_recipe_items(search_result):
     export_to_json(search_result)
     
     logger.info(f"Processing recipe items...")
-    recipes = search_result.get("data", {}).get("foods", {}).get("search", {}).get("foodSearchResults", [])
+    recipes = nested_get(search_result, "data", "foods", "search", "foodSearchResults", default=[])
+    if not isinstance(recipes, list):
+        recipes = []
     
     # Create list to store all recipe items
     all_recipe_items = []
@@ -559,7 +569,9 @@ def process_ingredients(ingredient_result):
     # Process ingredients
     logger.info(f"Processing ingredients...")
     if ingredient_result:
-        ingredient_items = ingredient_result.get("data", {}).get("foods", {}).get("search", {}).get("foodSearchResults", [])
+        ingredient_items = nested_get(ingredient_result, "data", "foods", "search", "foodSearchResults", default=[])
+        if not isinstance(ingredient_items, list):
+            ingredient_items = []
         for item in ingredient_items:
             nutrients = get_analysis_at_100g(analysis_query, item['id'])            
             ingredient_info = get_food_details(item['id'])
@@ -597,7 +609,9 @@ def process_recipes(recipe_result):
     
     # Process recipes
     if recipe_result:
-        recipe_items = recipe_result.get("data", {}).get("foods", {}).get("search", {}).get("foodSearchResults", [])
+        recipe_items = nested_get(recipe_result, "data", "foods", "search", "foodSearchResults", default=[])
+        if not isinstance(recipe_items, list):
+            recipe_items = []
         for item in recipe_items:
             # If you want to get LabelRounded analysis, you must insert code here to call the label_query to get the 
             # label_id for this food, then call the get_analysis_labelrounded function.
