@@ -251,10 +251,10 @@ def run_query(graphql_query, variables):
         headers=headers
     )
     if response.status_code == 200:
+        print(f"Query executed successfully: {response.text}")
         return response.json()
     else:
         logger.error(f"Request failed with status code {response.status_code}")
-        logger.error(response.text)
         logger.error(f"Endpoint: {endpoint}")
         logger.error(f"Query: {graphql_query} \r\n Variables: {variables}")
         return None
@@ -425,6 +425,7 @@ def get_food_details(food_id):
     
     logger.info(f"Running query to get item details for {food_id} ...")
     result = run_query(food_query, variables)
+    print (f"result: {result}")
     if not result or result.get("errors"):
         logger.error(f"Error getting food details for {food_id} ({format_graphql_errors(result)})")
         return {}
