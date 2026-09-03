@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="120" viewBox="0 0 320 120">
+  <rect x="4" y="4" width="312" height="112" rx="18" fill="#f2f2f2" stroke="#222"/>
+  <circle cx="60" cy="60" r="32" fill="#4b8cff"/>
+  <text x="110" y="68" font-family="Arial, sans-serif" font-size="24" fill="#222">SVG to PNG</text>
+</svg>
