@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" class="label filled positioned resized rendered" shape-rendering="crispEdges" preserveAspectRatio="xMinYMin meet" x="0" y="0" width="438.96" height="113.94" viewBox="0 0 438.96 113.94">
+  <style>
+  svg.label { background-color: #fff; fill: #000; font-size: 8pt; }
+  text { font-family: Arial, sans-serif; }
+  .condensed text { font-family: "Archivo Narrow", "Arial Narrow", Arial, sans-serif; font-stretch: condensed; }
+  .title { font-size: 13pt; }
+  .supplemented .title { font-size: 10pt; }
+  .simplified .supplemented .title { font-size: 11pt; }
+  .bold { font-weight: 700; }
+  .serving-size { font-size: 8pt; }
+  .per-container { font-size: 8pt; }
+  .calorie-title { font-size: 9pt; }
+  .asterisk { font-size: 9pt; }
+  .normal { font-weight: normal; }
+  .right { text-anchor: end; }
+  line,
+    rect { stroke: #000; }
+  rect { stroke-width: 0.5pt; }
+  line { stroke-width: 0.25pt; }
+  .medium { stroke-width: 2.5pt; }
+  .thick { stroke-width: 2pt; }
+  .simplified .thick { stroke-width: 2.5pt; }
+  .thin { stroke-width: 0.5pt; }
+  .blank line { stroke: #fff; }
+  .nutrient { font-size: 7pt; }
+  .supplemented-footnote,
+    .less-more { font-size: 6pt; }
+  .daily-value { font-size: 6pt; }
+  .insignificant { font-size: 6pt; }
+  .dagger { font-size: 4pt; }
+  .superscript { baseline-shift: super; font-size: 70%; }
+  </style>
+  <g class="condensed">
+    <rect x="0" y="0" width="100%" height="100%" fill="none"/>
+    <g>
+      <g>
+        <text x="3.33" y="16.16" class="title bold">Nutrition Facts</text>
+        <text x="3.33" y="34.83" class="title bold">Valeur nutritive</text>
+      </g>
+      <g>
+        <text x="3.33" y="52.16" class="serving-size">Per  (100000 g)</text>
+        <text x="3.33" y="64.16" class="serving-size">pour  (100000 g)</text>
+      </g>
+      <g>
+        
+      </g>
+      <g class="calorie-title bold">
+        <text x="3.33" y="81.49" class="bold">
+          <tspan class="bold">Calories</tspan>
+          <tspan class="bold">--</tspan>
+        </text>
+      </g>
+      <g>
+        <text x="3.33" y="96.16">
+          <tspan>*</tspan>
+          <tspan class="daily-value" dx="-1.5">DV = Daily Value</tspan>
+        </text>
+      </g>
+      <g>
+        <text x="3.33" y="105.49">
+          <tspan>*</tspan>
+          <tspan class="daily-value" dx="-1.5">VQ = valeur quotidienne</tspan>
+        </text>
+      </g>
+      
+    </g>
+    <g>
+      <g>
+        <g>
+          <g>
+            <g class="daily-value">
+              <text x="272.29" y="10.79" class="right">
+                <tspan class="bold">% DV</tspan>
+                <tspan dx="-1.5">*</tspan>
+                <tspan>/</tspan>
+                <tspan class="bold">% VQ</tspan>
+                <tspan dx="-1.5">*</tspan>
+              </text>
+            </g>
+            <line x1="110.95" y1="14.75" x2="272.29" y2="14.75" class="thin"/>
+            <g class="nutrient bold">
+              
+              <g class="bold">
+                <text x="110.95" y="28.12" class="bold">
+                  <tspan class="bold">Fat / Lipides</tspan>
+                  <tspan class="normal">-- g</tspan>
+                </text>
+              </g>
+              <text x="272.29" y="28.12" class="right normal">--  %</text>
+              
+            </g><g class="nutrient">
+              
+              <g>
+                <text x="118.95" y="40.12">
+                  <tspan>Saturated / saturés</tspan>
+                  <tspan class="normal">-- g</tspan>
+                </text>
+              </g>
+              <text x="272.29" y="40.12" dy="5" class="right normal">--  %</text>
+            </g><g class="nutrient">
+              
+              <g>
+                <text x="118.95" y="52.12">
+                  <tspan>+ Trans / trans</tspan>
+                  <tspan class="normal">-- g</tspan>
+                </text>
+              </g>
+              
+            </g><g class="nutrient bold">
+              <line x1="110.95" y1="57.46" x2="272.29" y2="57.46" class="thin bold"/>
+              <g class="bold">
+                <text x="110.95" y="69.45" class="bold">
+                  <tspan class="bold">Carbohydrate / Glucides</tspan>
+                  <tspan class="normal">-- g</tspan>
+                </text>
+              </g>
+              
+            </g><g class="nutrient">
+              
+              <g>
+                <text x="118.95" y="81.45">
+                  <tspan>Fibre / Fibres</tspan>
+                  <tspan class="normal">-- g</tspan>
+                </text>
+              </g>
+              <text x="272.29" y="81.45" class="right normal">--  %</text>
+              
+            </g><g class="nutrient">
+              
+              <g>
+                <text x="118.95" y="93.45">
+                  <tspan>Sugars / Sucres</tspan>
+                  <tspan class="normal">-- g</tspan>
+                </text>
+              </g>
+              <text x="272.29" y="93.45" class="right normal">--  %</text>
+              
+            </g>
+
+            <line x1="110.95" y1="98.47" x2="272.29" y2="98.47" class="thick"/>
+          </g>
+          <g>
+            <g class="daily-value">
+              <text x="435.63" y="10.79" class="right">
+                <tspan class="bold">% DV</tspan>
+                <tspan dx="-1.5">*</tspan>
+                <tspan>/</tspan>
+                <tspan class="bold">% VQ</tspan>
+                <tspan dx="-1.5">*</tspan>
+              </text>
+            </g>
+            <line x1="278.96" y1="14.75" x2="435.63" y2="14.75" class="thin"/>
+            <g class="nutrient bold">
+              
+              <g class="bold">
+                <text x="278.96" y="25.46" class="bold">
+                  <tspan class="bold">Protein / Protéines</tspan>
+                  <tspan class="normal">-- g</tspan>
+                </text>
+              </g>
+              
+            </g><g class="nutrient bold">
+              <line x1="278.96" y1="29.46" x2="435.63" y2="29.46" class="thin bold"/>
+              <g class="bold">
+                <text x="278.96" y="40.13" class="bold">
+                  <tspan class="bold">Cholesterol / Cholestérol</tspan>
+                  <tspan class="normal">-- mg</tspan>
+                </text>
+              </g>
+              
+            </g><g class="nutrient bold">
+              <line x1="278.96" y1="44.13" x2="435.63" y2="44.13" class="thin bold"/>
+              <g class="bold">
+                <text x="278.96" y="54.8" class="bold">
+                  <tspan class="bold">Sodium</tspan>
+                  <tspan class="normal">-- mg</tspan>
+                </text>
+              </g>
+              <text x="435.63" y="54.8" class="right normal">--  %</text>
+            </g><g class="nutrient">
+              <line x1="278.96" y1="60.14" x2="435.63" y2="60.14" class="thick"/>
+              <g>
+                <text x="278.96" y="72.13">
+                  <tspan>Potassium</tspan>
+                  <tspan class="normal">-- mg</tspan>
+                </text>
+              </g>
+              <text x="435.63" y="72.13" class="right normal">--  %</text>
+            </g><g class="nutrient">
+              
+              <g>
+                <text x="278.96" y="82.8">
+                  <tspan>Calcium</tspan>
+                  <tspan class="normal">-- mg</tspan>
+                </text>
+              </g>
+              <text x="435.63" y="82.8" class="right normal">--  %</text>
+            </g><g class="nutrient">
+              
+              <g>
+                <text x="278.96" y="93.47">
+                  <tspan>Iron / Fer</tspan>
+                  <tspan class="normal">-- mg</tspan>
+                </text>
+              </g>
+              <text x="435.63" y="93.47" class="right normal">--  %</text>
+            </g>
+            <line x1="278.96" y1="98.47" x2="435.63" y2="98.47" class="thick"/>
+          </g>
+        </g>
+        <g>
+          <g>
+            <text x="110.95" y="109.27" class="less-more">
+              <tspan>*</tspan>
+              <tspan dx="-1.5">5% or less is</tspan>
+              <tspan class="bold">a little,</tspan>
+              <tspan>15% or more is</tspan>
+              <tspan class="bold">a lot</tspan>
+              <tspan>/</tspan>
+              <tspan>*</tspan>
+              <tspan dx="-1.5">5 % ou moins c'est</tspan>
+              <tspan class="bold">peu,</tspan>
+              <tspan>15 % ou plus c'est</tspan>
+              <tspan class="bold">beaucoup</tspan>
+            </text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

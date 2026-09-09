@@ -102,7 +102,9 @@ def convert_file(
 
     output = unique_output_path(destination_dir / f"{source.stem}.png", overwrite)
 
-    kwargs = {"svg_path": str(source)}
+    # resvg_py defaults dpi to 0, which makes pt/mm/in CSS units compute to 0
+    # and produces a correctly sized blank image. 96 is the CSS reference DPI.
+    kwargs = {"svg_path": str(source), "dpi": 96.0}
 
     # Explicit width/height takes precedence over quality/scale.
     if width is not None:
